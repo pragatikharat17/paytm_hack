@@ -11,11 +11,7 @@ class AIAssistantScreen extends StatefulWidget {
   final String? initialPrompt;
   final String? paymentIdHint;
 
-  const AIAssistantScreen({
-    super.key,
-    this.initialPrompt,
-    this.paymentIdHint,
-  });
+  const AIAssistantScreen({super.key, this.initialPrompt, this.paymentIdHint});
 
   @override
   State<AIAssistantScreen> createState() => _AIAssistantScreenState();
@@ -45,7 +41,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     _messages.add(
       ChatMessage(
         id: 'welcome',
-        text: 'Namaste! I am **AtlasAI**, your autonomous Paytm customer resolution teammate. How can I help you with your transactions or refunds today?',
+        text:
+            'Namaste! I am AtlasAI, your autonomous Paytm customer resolution teammate. How can I help you with your transactions or refunds today?',
         isUser: false,
         timestamp: DateTime.now(),
       ),
@@ -53,7 +50,10 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
     if (widget.initialPrompt != null && widget.initialPrompt!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _handleSend(prompt: widget.initialPrompt, paymentId: widget.paymentIdHint);
+        _handleSend(
+          prompt: widget.initialPrompt,
+          paymentId: widget.paymentIdHint,
+        );
       });
     }
 
@@ -103,7 +103,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     setState(() {
       _messages.add(userMsg);
       _isProcessing = true;
-      _activeAgentStep = 'Orchestrator Agent: Ingesting complaint & classifying intent...';
+      _activeAgentStep =
+          'Orchestrator Agent: Ingesting complaint & classifying intent...';
     });
     _scrollToBottom();
 
@@ -111,7 +112,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     Future.delayed(const Duration(milliseconds: 600), () {
       if (mounted && _isProcessing) {
         setState(() {
-          _activeAgentStep = 'Transaction Agent: Investigating gateway ledger & bank status...';
+          _activeAgentStep =
+              'Transaction Agent: Investigating gateway ledger & bank status...';
         });
       }
     });
@@ -119,7 +121,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted && _isProcessing) {
         setState(() {
-          _activeAgentStep = 'Policy & Risk Agent: Checking refund rules & fraud thresholds...';
+          _activeAgentStep =
+              'Policy & Risk Agent: Checking refund rules & fraud thresholds...';
         });
       }
     });
@@ -150,7 +153,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
         _scrollToBottom();
 
         // Auto-play audio response if present
-        if (assistantMsg.audioBase64 != null && assistantMsg.audioBase64!.isNotEmpty) {
+        if (assistantMsg.audioBase64 != null &&
+            assistantMsg.audioBase64!.isNotEmpty) {
           _playAudio(assistantMsg.id, assistantMsg.audioBase64!);
         }
       }
@@ -198,7 +202,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     // Show voice recognition modal
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.navyCard,
+      backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -244,8 +248,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                   languageCode: _selectedLanguage == 'hi'
                       ? 'hi-IN'
                       : _selectedLanguage == 'mr'
-                          ? 'mr-IN'
-                          : 'en-IN',
+                      ? 'mr-IN'
+                      : 'en-IN',
                 );
                 final transcript = sttRes['transcript'] as String? ?? '';
                 if (transcript.isNotEmpty) {
@@ -253,7 +257,8 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                   _handleSend(prompt: transcript);
                 }
               } catch (e) {
-                _textController.text = '₹499 कट गए लेकिन पेमेंट फेल हो गया (PAY1001)';
+                _textController.text =
+                    '₹499 कट गए लेकिन पेमेंट फेल हो गया (PAY1001)';
                 _handleSend();
               }
             },
@@ -298,51 +303,50 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                 shape: BoxShape.circle,
                 color: AppTheme.tealPrimary,
               ),
-              child: const Icon(Icons.auto_awesome, size: 16, color: Colors.black),
+              child: const Icon(
+                Icons.auto_awesome,
+                size: 16,
+                color: Colors.black,
+              ),
             ),
             const SizedBox(width: 10),
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('AtlasAI Teammate', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-                Text('Autonomous Resolution Engine', style: TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-              ],
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AtlasAI Teammate',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    'Autonomous Resolution Engine',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
-          // Language Selector Dropdown
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: AppTheme.navyElevated,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppTheme.borderSubtle),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedLanguage,
-                icon: const Icon(Icons.language, size: 16, color: AppTheme.cyanAccent),
-                dropdownColor: AppTheme.navyElevated,
-                items: _languages.map((l) {
-                  return DropdownMenuItem<String>(
-                    value: l['code'],
-                    child: Text(
-                      l['label']!,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.textPrimary),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  if (val != null) {
-                    setState(() {
-                      _selectedLanguage = val;
-                    });
-                  }
-                },
-              ),
-            ),
+          PopupMenuButton<String>(
+            tooltip:
+                'Language: ${_languages.firstWhere((l) => l['code'] == _selectedLanguage)['label']}',
+            initialValue: _selectedLanguage,
+            icon: const Icon(Icons.language, color: AppTheme.cyanAccent),
+            onSelected: (value) => setState(() => _selectedLanguage = value),
+            itemBuilder: (_) => _languages
+                .map(
+                  (language) => CheckedPopupMenuItem<String>(
+                    value: language['code'],
+                    checked: language['code'] == _selectedLanguage,
+                    child: Text(language['label']!),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -366,7 +370,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: AppTheme.navyElevated,
+              color: AppTheme.surfaceTint,
               child: Row(
                 children: [
                   const SizedBox(
@@ -381,7 +385,11 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                   Expanded(
                     child: Text(
                       _activeAgentStep,
-                      style: const TextStyle(fontSize: 12, color: AppTheme.cyanAccent, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.cyanAccent,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -392,7 +400,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: const BoxDecoration(
-              color: AppTheme.navyCard,
+              color: AppTheme.surface,
               border: Border(top: BorderSide(color: AppTheme.borderSubtle)),
             ),
             child: SafeArea(
@@ -410,7 +418,10 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                   Expanded(
                     child: TextField(
                       controller: _textController,
-                      style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 14,
+                      ),
                       decoration: const InputDecoration(
                         hintText: 'Describe issue or enter Payment ID...',
                         isDense: true,
@@ -445,10 +456,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
-        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+            mainAxisAlignment: isUser
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isUser) ...[
@@ -459,7 +474,11 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                     shape: BoxShape.circle,
                     color: AppTheme.tealPrimary,
                   ),
-                  child: const Icon(Icons.auto_awesome, size: 16, color: Colors.black),
+                  child: const Icon(
+                    Icons.auto_awesome,
+                    size: 16,
+                    color: Colors.black,
+                  ),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -467,14 +486,20 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: isUser ? AppTheme.tealPrimary : AppTheme.navyCard,
+                    color: isUser ? AppTheme.tealPrimary : AppTheme.surface,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
-                      bottomLeft: isUser ? const Radius.circular(16) : const Radius.circular(4),
-                      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(16),
+                      bottomLeft: isUser
+                          ? const Radius.circular(16)
+                          : const Radius.circular(4),
+                      bottomRight: isUser
+                          ? const Radius.circular(4)
+                          : const Radius.circular(16),
                     ),
-                    border: isUser ? null : Border.all(color: AppTheme.borderSubtle),
+                    border: isUser
+                        ? null
+                        : Border.all(color: AppTheme.borderSubtle),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,29 +515,45 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                       ),
 
                       // Audio playback controls if voice response exists
-                      if (msg.audioBase64 != null && msg.audioBase64!.isNotEmpty) ...[
+                      if (msg.audioBase64 != null &&
+                          msg.audioBase64!.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         InkWell(
                           onTap: () => _playAudio(msg.id, msg.audioBase64!),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppTheme.navyElevated,
+                              color: AppTheme.surfaceTint,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppTheme.cyanAccent.withValues(alpha: 0.3)),
+                              border: Border.all(
+                                color: AppTheme.cyanAccent.withValues(
+                                  alpha: 0.3,
+                                ),
+                              ),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _currentlyPlayingId == msg.id ? Icons.stop_circle : Icons.play_circle_fill,
+                                  _currentlyPlayingId == msg.id
+                                      ? Icons.stop_circle
+                                      : Icons.play_circle_fill,
                                   color: AppTheme.cyanAccent,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  _currentlyPlayingId == msg.id ? 'Stop Voice' : 'Play Voice (${msg.language?.toUpperCase() ?? "EN"})',
-                                  style: const TextStyle(fontSize: 11, color: AppTheme.cyanAccent, fontWeight: FontWeight.w600),
+                                  _currentlyPlayingId == msg.id
+                                      ? 'Stop Voice'
+                                      : 'Play Voice (${msg.language?.toUpperCase() ?? "EN"})',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: AppTheme.cyanAccent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ],
                             ),
@@ -527,7 +568,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
           ),
 
           // Embedded Resolution Card for Assistant responses with structured actions
-          if (res != null) ...[
+          if (res != null && res.outcome != 'INFO_ONLY') ...[
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.only(left: 40),
@@ -551,22 +592,25 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       badgeText = 'QUEUED FOR ADMIN APPROVAL';
     } else if (res.outcome == 'ESCALATED') {
       badgeColor = AppTheme.roseDanger;
-      badgeText = 'ESCALATED TO FRAUD DESK';
+      badgeText = res.ticket?.category == 'FRAUD_DISPUTE'
+          ? 'ESCALATED TO FRAUD DESK'
+          : 'ESCALATED TO SUPPORT';
     }
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.navyElevated,
+        color: AppTheme.surfaceTint,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -583,10 +627,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                   ),
                 ),
               ),
-              Text(
-                'Confidence: ${(res.confidence * 100).toInt()}%',
-                style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
-              ),
+              if (res.confidence != null)
+                Text(
+                  'Confidence: ${(res.confidence! * 100).toInt()}%',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textMuted,
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 10),
@@ -594,29 +642,47 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
           if (res.refund != null) ...[
             Text(
               'Refund ID: ${res.refund!.refundId}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
             ),
             Text(
               'Amount: ₹${res.refund!.amount.toStringAsFixed(2)} • Status: ${res.refund!.status}',
-              style: const TextStyle(fontSize: 12, color: AppTheme.emeraldSuccess),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppTheme.emeraldSuccess,
+              ),
             ),
           ],
 
           if (res.approval != null) ...[
             Text(
               'Approval ID: ${res.approval!.approvalId}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
             ),
             Text(
               'Amount: ₹${res.approval!.amount.toStringAsFixed(2)} (Awaiting Supervisor Sign-off)',
-              style: const TextStyle(fontSize: 12, color: AppTheme.amberWarning),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppTheme.amberWarning,
+              ),
             ),
           ],
 
           if (res.ticket != null) ...[
             Text(
               'Dispute Ticket: ${res.ticket!.ticketId}',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
             ),
             Text(
               'Category: ${res.ticket!.category} • Priority: ${res.ticket!.priority}',
@@ -633,13 +699,24 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => TransactionDetailsScreen(paymentId: res.paymentId!),
+                        builder: (_) =>
+                            TransactionDetailsScreen(paymentId: res.paymentId!),
                       ),
                     );
                   },
-                  icon: const Icon(Icons.receipt_long, size: 14, color: AppTheme.cyanAccent),
-                  label: const Text('View Payment', style: TextStyle(fontSize: 11, color: AppTheme.cyanAccent)),
-                  style: TextButton.styleFrom(padding: EdgeInsets.zero, visualDensity: VisualDensity.compact),
+                  icon: const Icon(
+                    Icons.receipt_long,
+                    size: 14,
+                    color: AppTheme.cyanAccent,
+                  ),
+                  label: const Text(
+                    'View Payment',
+                    style: TextStyle(fontSize: 11, color: AppTheme.cyanAccent),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
                 ),
             ],
           ),

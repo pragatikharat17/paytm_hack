@@ -15,7 +15,7 @@ class AtlasAIApp extends StatelessWidget {
     return MaterialApp(
       title: 'AtlasAI — Autonomous Customer Resolution Teammate',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark(),
+      theme: AppTheme.light(),
       home: const SplashScreen(),
     );
   }

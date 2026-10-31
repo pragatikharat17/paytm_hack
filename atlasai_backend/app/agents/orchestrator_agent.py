@@ -12,6 +12,7 @@ The master controller for AtlasAI autonomous resolution:
 8. Records complete audit trails and agent decisions.
 """
 
+import re
 import uuid
 import datetime
 from typing import Dict, Any, Optional, List
@@ -46,7 +47,9 @@ class OrchestratorAgent:
         # -------------------------------------------------------------
         extraction = await sarvam_service.extract_intent_and_entities(complaint_text, input_language or "en")
         intent = extraction.get("intent", "GENERAL_PAYMENT_INQUIRY")
-        extracted_pay_id = extraction.get("payment_id") or payment_id_hint
+        # Only act on a payment explicitly supplied by the customer/client.
+        payment_match = re.search(r"\bPAY\d{4,8}\b", complaint_text, re.IGNORECASE)
+        extracted_pay_id = payment_match.group(0).upper() if payment_match else payment_id_hint
         
         # Detect or refine language
         detected_lang = input_language or "en"
@@ -73,6 +76,24 @@ class OrchestratorAgent:
             timestamp=datetime.datetime.utcnow()
         )
         workflow_steps.append(step1)
+
+        actionable_intents = {
+            "FAILED_PAYMENT_REFUND", "DISPUTE_UNRECOGNIZED_TRANSACTION",
+            "INVESTIGATE_PENDING_TRANSACTION",
+        }
+        if intent not in actionable_intents or not extracted_pay_id:
+            messages = {
+                "en": "Namaste! I can help with payments and refunds. Please describe what happened and share the payment ID (for example, PAY1001).",
+                "hi": "नमस्ते! मैं भुगतान और रिफंड में मदद कर सकता हूँ। कृपया समस्या बताएं और पेमेंट आईडी (जैसे PAY1001) साझा करें।",
+                "mr": "नमस्कार! मी पेमेंट आणि रिफंडसाठी मदत करू शकतो. कृपया समस्या सांगा आणि पेमेंट आयडी (उदा. PAY1001) द्या.",
+            }
+            return AgentResolveResponse(
+                outcome="INFO_ONLY",
+                final_message=messages["en"],
+                translated_message=messages.get(detected_lang.split("-")[0], messages["en"]),
+                language=detected_lang,
+                workflow_steps=workflow_steps,
+            )
 
         # Create or find Complaint record
         complaint_id = f"CMP_{uuid.uuid4().hex[:8].upper()}"

@@ -113,7 +113,7 @@ class AgentResolution {
   final String finalMessage;
   final String? translatedMessage;
   final String language;
-  final double confidence;
+  final double? confidence;
   final String? paymentId;
   final RefundInfo? refund;
   final ApprovalInfo? approval;
@@ -145,13 +145,20 @@ class AgentResolution {
       finalMessage: json['final_message'] ?? '',
       translatedMessage: json['translated_message'],
       language: json['language'] ?? 'en',
-      confidence: (json['confidence'] as num?)?.toDouble() ?? 1.0,
+      confidence: (json['confidence'] as num?)?.toDouble(),
       paymentId: json['payment_id'],
-      refund: json['refund'] != null ? RefundInfo.fromJson(json['refund']) : null,
-      approval: json['approval'] != null ? ApprovalInfo.fromJson(json['approval']) : null,
-      ticket: json['ticket'] != null ? TicketInfo.fromJson(json['ticket']) : null,
+      refund: json['refund'] != null
+          ? RefundInfo.fromJson(json['refund'])
+          : null,
+      approval: json['approval'] != null
+          ? ApprovalInfo.fromJson(json['approval'])
+          : null,
+      ticket: json['ticket'] != null
+          ? TicketInfo.fromJson(json['ticket'])
+          : null,
       toolsCalled: json['tools_called'] ?? [],
-      workflowSteps: (json['workflow_steps'] as List<dynamic>?)
+      workflowSteps:
+          (json['workflow_steps'] as List<dynamic>?)
               ?.map((e) => WorkflowStep.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

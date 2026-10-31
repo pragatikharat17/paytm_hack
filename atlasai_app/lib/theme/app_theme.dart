@@ -1,38 +1,40 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Brand colors
-  static const Color navyBackground = Color(0xFF0A192F);
-  static const Color navyCard = Color(0xFF112240);
-  static const Color navyElevated = Color(0xFF1B2A4A);
+  static const Color brandBlue = Color(0xFF004A99);
+  // Shared light surfaces and Paytm-inspired brand colors
+  static const Color background = Color(0xFFF5F5F5);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceTint = Color(0xFFEDF6FC);
   static const Color tealPrimary = Color(0xFF00B4D8);
-  static const Color cyanAccent = Color(0xFF00E5FF);
-  static const Color amberWarning = Color(0xFFF59E0B);
-  static const Color emeraldSuccess = Color(0xFF10B981);
-  static const Color roseDanger = Color(0xFFEF4444);
+  static const Color cyanAccent = Color(0xFF0079BC);
+  static const Color amberWarning = Color(0xFF9A6400);
+  static const Color emeraldSuccess = Color(0xFF12835B);
+  static const Color roseDanger = Color(0xFFD43546);
 
-  static const Color textPrimary = Color(0xFFF8FAFC);
-  static const Color textMuted = Color(0xFF94A3B8);
-  static const Color borderSubtle = Color(0xFF233554);
+  static const Color textPrimary = Color(0xFF17191C);
+  static const Color textMuted = Color(0xFF657382);
+  static const Color borderSubtle = Color(0xFFE5EBF0);
 
-  static ThemeData dark() {
+  static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
-      scaffoldBackgroundColor: navyBackground,
-      colorScheme: const ColorScheme.dark(
-        primary: tealPrimary,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: background,
+      colorScheme: const ColorScheme.light(
+        primary: brandBlue,
         secondary: cyanAccent,
-        surface: navyCard,
+        surface: surface,
         error: roseDanger,
-        onPrimary: Colors.black,
+        onPrimary: Colors.white,
         onSecondary: Colors.black,
         onSurface: textPrimary,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: navyBackground,
+        backgroundColor: background,
         foregroundColor: textPrimary,
         elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
           color: textPrimary,
@@ -42,7 +44,7 @@ class AppTheme {
         ),
       ),
       cardTheme: const CardThemeData(
-        color: navyCard,
+        color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -51,8 +53,11 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: navyElevated,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        fillColor: surfaceTint,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: borderSubtle),
@@ -76,10 +81,7 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
+          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
         ),
       ),
     );

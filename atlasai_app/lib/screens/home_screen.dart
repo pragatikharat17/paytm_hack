@@ -51,456 +51,518 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  final _paymentsKey = GlobalKey();
+  final _casesKey = GlobalKey();
+
+  void _openAssistant({String? prompt, String? paymentId}) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            AIAssistantScreen(initialPrompt: prompt, paymentIdHint: paymentId),
+      ),
+    );
+  }
+
+  void _scrollTo(GlobalKey key) {
+    final target = key.currentContext;
+    if (target != null) {
+      Scrollable.ensureVisible(
+        target,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.navyBackground,
       appBar: AppBar(
+        toolbarHeight: 76,
+        titleSpacing: 16,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppTheme.tealPrimary,
-              ),
-              child: const Icon(Icons.bolt, size: 18, color: Colors.black87),
+            const CircleAvatar(
+              backgroundColor: Color(0xFFEDE5FA),
+              foregroundColor: Color(0xFF7041A6),
+              child: Text('AI', style: TextStyle(fontSize: 16)),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             const Expanded(
-              child: Text(
-                'AtlasAI Paytm',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AtlasAI Paytm',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.brandBlue,
+                    ),
+                  ),
+                  Text(
+                    'Your payment companion',
+                    style: TextStyle(fontSize: 11, color: AppTheme.textMuted),
+                  ),
+                ],
               ),
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
+            onPressed: _isLoading ? null : _loadData,
+            icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh Transactions',
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppTheme.tealPrimary),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: _loadData,
-              color: AppTheme.tealPrimary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: EdgeInsets.fromLTRB(
-                  20,
-                  16,
-                  20,
-                  100 + MediaQuery.paddingOf(context).bottom,
+                  12,
+                  8,
+                  12,
+                  110 + MediaQuery.paddingOf(context).bottom,
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (_errorMessage != null)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: AppTheme.roseDanger.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppTheme.roseDanger.withValues(alpha: 0.4),
-                          ),
-                        ),
+                    _buildHeroCard(),
+                    const SizedBox(height: 20),
+                    _section(
+                      title: 'Payments & Support',
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final count =
+                              constraints.maxWidth < 280 ||
+                                  MediaQuery.textScalerOf(context).scale(1) >
+                                      1.3
+                              ? 2
+                              : 4;
+                          final items = [
+                            _service(
+                              'File Dispute',
+                              Icons.chat_bubble_outline_rounded,
+                              () => _openAssistant(),
+                            ),
+                            _service(
+                              'Voice Assistant',
+                              Icons.mic_none_rounded,
+                              () => _openAssistant(),
+                            ),
+                            _service(
+                              'Payment History',
+                              Icons.receipt_long_outlined,
+                              () => _scrollTo(_paymentsKey),
+                            ),
+                            _service(
+                              'Track Cases',
+                              Icons.assignment_outlined,
+                              () => _scrollTo(_casesKey),
+                            ),
+                          ];
+                          return Wrap(
+                            spacing: 8,
+                            runSpacing: 20,
+                            children: items
+                                .map(
+                                  (item) => SizedBox(
+                                    width:
+                                        (constraints.maxWidth -
+                                            (count - 1) * 8) /
+                                        count,
+                                    child: item,
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _section(
+                      title: 'Explore Resolution Demos',
+                      subtitle: 'Try a simulated payment issue',
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
                         child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                              Icons.info_outline,
-                              color: AppTheme.roseDanger,
-                              size: 20,
+                            _demoCard(
+                              'Quick refund',
+                              '₹499',
+                              'Failed payment',
+                              Icons.currency_rupee_rounded,
+                              const Color(0xFFE2F6ED),
+                              '₹499 was deducted, but my payment failed. Please refund my money. (PAY1001)',
+                              'PAY1001',
                             ),
                             const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppTheme.roseDanger,
-                                ),
-                              ),
+                            _demoCard(
+                              'Approval review',
+                              '₹1,299',
+                              'Higher-value refund',
+                              Icons.verified_user_outlined,
+                              const Color(0xFFFFF6DA),
+                              "My ₹1,299 payment failed. I haven't received my refund. (PAY1002)",
+                              'PAY1002',
+                            ),
+                            const SizedBox(width: 10),
+                            _demoCard(
+                              'Report a payment',
+                              '₹899',
+                              'Unrecognized charge',
+                              Icons.shield_outlined,
+                              const Color(0xFFFDE9ED),
+                              "I don't recognize this ₹899 transaction. This might be unauthorized fraud! (PAY1003)",
+                              'PAY1003',
                             ),
                           ],
                         ),
                       ),
-                    // Welcome & Hero Card
-                    _buildHeroCard(),
-                    const SizedBox(height: 24),
-
-                    // Hackathon Demo Scenarios Shortcut Bar
-                    _buildDemoScenariosSection(),
-                    const SizedBox(height: 28),
-
-                    // Quick Actions
-                    _buildQuickActions(),
-                    const SizedBox(height: 28),
-
-                    // Recent Payments
-                    Wrap(
-                      alignment: WrapAlignment.spaceBetween,
-                      spacing: 12,
-                      runSpacing: 4,
-                      children: [
-                        const Text(
-                          'Recent Payments',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppTheme.textPrimary,
-                          ),
-                        ),
-                        Text(
-                          '${_payments.length} Records',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppTheme.textMuted,
-                          ),
-                        ),
-                      ],
                     ),
-                    const SizedBox(height: 12),
-                    if (_payments.isEmpty)
-                      _buildEmptyState('No simulated payments found.')
-                    else
-                      ..._payments.map((p) => _buildPaymentCard(p)),
-
-                    const SizedBox(height: 28),
-
-                    // Recent Resolution Cases
-                    if (_complaints.isNotEmpty) ...[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFCEF2FA),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Row(
                         children: [
-                          const Text(
-                            'Active Cases & Disputes',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.textPrimary,
+                          const Icon(
+                            Icons.record_voice_over_outlined,
+                            size: 32,
+                            color: AppTheme.brandBlue,
+                          ),
+                          const SizedBox(width: 14),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Help in your language',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'English • हिंदी • मराठी',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppTheme.textMuted,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          Text(
-                            '${_complaints.length} Cases',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.textMuted,
+                          IconButton(
+                            onPressed: () => _openAssistant(),
+                            icon: const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: AppTheme.brandBlue,
                             ),
+                            tooltip: 'Open multilingual assistant',
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      ..._complaints.take(4).map((c) => _buildComplaintCard(c)),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      key: _paymentsKey,
+                      child: _section(
+                        title: 'Recent Payments',
+                        subtitle: '${_payments.length} transactions',
+                        child: Column(
+                          children: [
+                            if (_errorMessage != null)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.cloud_off_outlined,
+                                      size: 18,
+                                      color: AppTheme.textMuted,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        _errorMessage!,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppTheme.textMuted,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (_payments.isEmpty)
+                              _buildEmptyState(
+                                'Your payments will appear here.',
+                              )
+                            else
+                              ..._payments.map(_buildPaymentCard),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      key: _casesKey,
+                      child: _section(
+                        title: 'Your Support Cases',
+                        child: Column(
+                          children: [
+                            if (_complaints.isEmpty)
+                              _buildEmptyState(
+                                _errorMessage != null
+                                    ? 'Connect to load your support cases.'
+                                    : 'No cases yet. We’re here when you need us.',
+                              )
+                            else
+                              ..._complaints.take(4).map(_buildComplaintCard),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Center(
+                      child: Text(
+                        'Built for simpler payment support',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppTheme.textMuted,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AIAssistantScreen()),
-          );
-        },
-        backgroundColor: AppTheme.tealPrimary,
-        foregroundColor: Colors.black,
-        icon: const Icon(Icons.auto_awesome),
-        label: const Text(
-          'AI Resolution Teammate',
-          style: TextStyle(fontWeight: FontWeight.w700),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(40),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF0875CE), Color(0xFF002970)],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.brandBlue.withValues(alpha: 0.24),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
+        child: FloatingActionButton.extended(
+          onPressed: () => _openAssistant(),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          shape: const StadiumBorder(
+            side: BorderSide(color: Color(0xFF51B9EE)),
+          ),
+          icon: const Icon(Icons.auto_awesome_outlined),
+          label: const Text(
+            'Ask AtlasAI',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _section({
+    required String title,
+    String? subtitle,
+    required Widget child,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.4,
+            ),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+            ),
+          ],
+          const SizedBox(height: 20),
+          child,
+        ],
       ),
     );
   }
 
   Widget _buildHeroCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E3A8A), Color(0xFF0F766E)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Autonomous Agent Ready',
-                    style: TextStyle(
-                      color: AppTheme.cyanAccent,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFE2F5FC), width: 6),
+            ),
+            child: const Icon(
+              Icons.verified_user_outlined,
+              size: 44,
+              color: AppTheme.brandBlue,
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Payment stuck?\nLet’s sort it out.',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.brandBlue,
+                    height: 1.15,
                   ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.shield_outlined,
-                color: Colors.white70,
-                size: 20,
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          const Text(
-            'Instant Payment\nResolution Engine',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.2,
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => _openAssistant(),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFE84A),
+                    foregroundColor: AppTheme.brandBlue,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                  child: const Text('Get help →'),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Autonomous refunds, multi-agent investigations & multilingual voice support in Hindi & Marathi.',
-            style: TextStyle(fontSize: 12, color: Colors.white70),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDemoScenariosSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Hackathon Demo Scenarios',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: AppTheme.cyanAccent,
-          ),
-        ),
-        const SizedBox(height: 10),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildScenarioChip(
-                label: 'Scenario A: ₹499 Auto-Refund',
-                scenarioPrompt:
-                    '₹499 was deducted, but my payment failed. Please refund my money. (PAY1001)',
-                paymentId: 'PAY1001',
-                color: AppTheme.emeraldSuccess,
-              ),
-              const SizedBox(width: 10),
-              _buildScenarioChip(
-                label: 'Scenario B: ₹1,299 Admin Approval',
-                scenarioPrompt:
-                    "My ₹1,299 payment failed. I haven't received my refund. (PAY1002)",
-                paymentId: 'PAY1002',
-                color: AppTheme.amberWarning,
-              ),
-              const SizedBox(width: 10),
-              _buildScenarioChip(
-                label: 'Scenario C: ₹899 Fraud Dispute',
-                scenarioPrompt:
-                    "I don't recognize this ₹899 transaction. This might be unauthorized fraud! (PAY1003)",
-                paymentId: 'PAY1003',
-                color: AppTheme.roseDanger,
-              ),
-              const SizedBox(width: 10),
-              _buildScenarioChip(
-                label: 'Scenario D: Marathi / Hindi Voice',
-                scenarioPrompt:
-                    'माझे ₹499 खात्यातून कट झाले पण पेमेंट अयशस्वी झाले. कृपया रिफंड करा. (PAY1001)',
-                paymentId: 'PAY1001',
-                color: AppTheme.cyanAccent,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildScenarioChip({
-    required String label,
-    required String scenarioPrompt,
-    required String paymentId,
-    required Color color,
-  }) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => AIAssistantScreen(
-              initialPrompt: scenarioPrompt,
-              paymentIdHint: paymentId,
-            ),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppTheme.navyCard,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: color),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActions() {
-    final actions = <Widget>[
-      _buildActionCard(
-        title: 'File Dispute',
-        subtitle: 'AI Agent Help',
-        icon: Icons.chat_bubble_outline,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AIAssistantScreen()),
-          );
-        },
-      ),
-      _buildActionCard(
-        title: 'Voice Assistant',
-        subtitle: 'Hindi / Marathi',
-        icon: Icons.mic_none,
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AIAssistantScreen(
-                initialPrompt:
-                    '₹499 कट गए लेकिन पेमेंट फेल हो गया, मेरा रिफंड कब आएगा? PAY1001',
-                paymentIdHint: 'PAY1001',
-              ),
-            ),
-          );
-        },
-      ),
-    ];
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth <
-            480 * MediaQuery.textScalerOf(context).scale(1)) {
-          return Column(
-            children: [actions[0], const SizedBox(height: 12), actions[1]],
-          );
-        }
-        return Row(
-          children: [
-            Expanded(child: actions[0]),
-            const SizedBox(width: 12),
-            Expanded(child: actions[1]),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildActionCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
+  Widget _service(String title, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppTheme.navyCard,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.borderSubtle),
-        ),
-        child: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: AppTheme.tealPrimary.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+              width: 48,
+              height: 48,
+              decoration: const BoxDecoration(
+                color: AppTheme.brandBlue,
+                shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppTheme.tealPrimary, size: 22),
+              child: Icon(icon, color: Colors.white, size: 25),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.textMuted,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 10),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                height: 1.3,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _demoCard(
+    String title,
+    String amount,
+    String detail,
+    IconData icon,
+    Color color,
+    String prompt,
+    String paymentId,
+  ) {
+    return SizedBox(
+      width: 154,
+      child: Material(
+        color: color,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => _openAssistant(prompt: prompt, paymentId: paymentId),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Icon(icon, color: AppTheme.brandBlue, size: 32),
+                const SizedBox(height: 12),
+                Text(
+                  amount,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.brandBlue,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textMuted,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 18,
+                  color: AppTheme.brandBlue,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -513,7 +575,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.navyCard,
+        color: AppTheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.borderSubtle),
       ),
@@ -613,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: AppTheme.navyElevated,
+        color: AppTheme.surfaceTint,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.borderSubtle),
       ),

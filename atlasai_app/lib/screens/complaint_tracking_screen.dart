@@ -14,7 +14,8 @@ class ComplaintTrackingScreen extends StatefulWidget {
   });
 
   @override
-  State<ComplaintTrackingScreen> createState() => _ComplaintTrackingScreenState();
+  State<ComplaintTrackingScreen> createState() =>
+      _ComplaintTrackingScreenState();
 }
 
 class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
@@ -65,21 +66,33 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.tealPrimary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.tealPrimary),
+            )
           : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, color: AppTheme.roseDanger, size: 48),
-                      const SizedBox(height: 12),
-                      Text('Error: $_error', style: const TextStyle(color: AppTheme.textMuted)),
-                      const SizedBox(height: 16),
-                      ElevatedButton(onPressed: _loadComplaint, child: const Text('Retry')),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppTheme.roseDanger,
+                    size: 48,
                   ),
-                )
-              : _buildTimelineContent(),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Error: $_error',
+                    style: const TextStyle(color: AppTheme.textMuted),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadComplaint,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : _buildTimelineContent(),
     );
   }
 
@@ -103,7 +116,7 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppTheme.navyCard,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppTheme.borderSubtle),
             ),
@@ -122,7 +135,10 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
@@ -142,23 +158,37 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
                 if (c.paymentId != null)
                   Text(
                     'Linked Payment: ${c.paymentId}',
-                    style: const TextStyle(color: AppTheme.tealPrimary, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      color: AppTheme.tealPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 const SizedBox(height: 8),
                 Text(
                   'Original Complaint: "${c.rawText}"',
-                  style: const TextStyle(color: AppTheme.textMuted, fontSize: 13, fontStyle: FontStyle.italic),
+                  style: const TextStyle(
+                    color: AppTheme.textMuted,
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
                 if (c.resolutionSummary != null) ...[
                   const Divider(color: AppTheme.borderSubtle, height: 24),
                   const Text(
                     'Resolution Summary:',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     c.resolutionSummary!,
-                    style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ],
@@ -169,25 +199,32 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
           // Lifecycle Progression Timeline
           const Text(
             'Resolution Journey',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const SizedBox(height: 16),
 
           _buildTimelineStep(
             title: '1. Complaint Ingested & Analyzed',
-            subtitle: 'Orchestrator Agent identified intent & language (${c.originalLanguage})',
+            subtitle:
+                'Orchestrator Agent identified intent & language (${c.originalLanguage})',
             isDone: true,
             isCurrent: false,
           ),
           _buildTimelineStep(
             title: '2. Payment Investigation & Gateway Audit',
-            subtitle: 'Transaction Agent retrieved bank debit drop verification',
+            subtitle:
+                'Transaction Agent retrieved bank debit drop verification',
             isDone: true,
             isCurrent: false,
           ),
           _buildTimelineStep(
             title: '3. Deterministic Policy Evaluation',
-            subtitle: 'Policy & Risk Agent verified refund limits and fraud checks',
+            subtitle:
+                'Policy & Risk Agent verified refund limits and fraud checks',
             isDone: true,
             isCurrent: isPendingApproval,
           ),
@@ -195,13 +232,13 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
             title: isPendingApproval
                 ? '4. Pending Supervisor Approval'
                 : isEscalated
-                    ? '4. Escalated to Tier-2 Fraud Desk'
-                    : '4. Autonomous Reversal Settled',
+                ? '4. Escalated to Tier-2 Fraud Desk'
+                : '4. Autonomous Reversal Settled',
             subtitle: isPendingApproval
                 ? 'Awaiting human authorization for high-value transaction'
                 : isEscalated
-                    ? 'Dispute ticket assigned to human fraud specialist'
-                    : 'Simulated payment switch verified instant credit',
+                ? 'Dispute ticket assigned to human fraud specialist'
+                : 'Simulated payment switch verified instant credit',
             isDone: isResolved || isEscalated,
             isCurrent: !isResolved && !isEscalated,
             isLast: true,
@@ -231,14 +268,14 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
                 color: isDone
                     ? AppTheme.emeraldSuccess
                     : isCurrent
-                        ? AppTheme.amberWarning
-                        : AppTheme.navyElevated,
+                    ? AppTheme.amberWarning
+                    : AppTheme.surfaceTint,
                 border: Border.all(
                   color: isDone
                       ? AppTheme.emeraldSuccess
                       : isCurrent
-                          ? AppTheme.amberWarning
-                          : AppTheme.borderSubtle,
+                      ? AppTheme.amberWarning
+                      : AppTheme.borderSubtle,
                   width: 2,
                 ),
               ),
@@ -247,10 +284,12 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
                   isDone
                       ? Icons.check
                       : isCurrent
-                          ? Icons.pending
-                          : Icons.circle,
+                      ? Icons.pending
+                      : Icons.circle,
                   size: 14,
-                  color: (isDone || isCurrent) ? Colors.black : AppTheme.textMuted,
+                  color: (isDone || isCurrent)
+                      ? Colors.black
+                      : AppTheme.textMuted,
                 ),
               ),
             ),
@@ -258,7 +297,9 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
               Container(
                 width: 2,
                 height: 44,
-                color: isDone ? AppTheme.emeraldSuccess.withValues(alpha: 0.5) : AppTheme.borderSubtle,
+                color: isDone
+                    ? AppTheme.emeraldSuccess.withValues(alpha: 0.5)
+                    : AppTheme.borderSubtle,
               ),
           ],
         ),
@@ -272,7 +313,9 @@ class _ComplaintTrackingScreenState extends State<ComplaintTrackingScreen> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
-                  color: isCurrent ? AppTheme.amberWarning : AppTheme.textPrimary,
+                  color: isCurrent
+                      ? AppTheme.amberWarning
+                      : AppTheme.textPrimary,
                 ),
               ),
               const SizedBox(height: 2),

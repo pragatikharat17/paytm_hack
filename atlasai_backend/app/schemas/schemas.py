@@ -204,7 +204,7 @@ class AgentResolveRequest(BaseModel):
 
 
 class AgentResolveResponse(BaseModel):
-    complaint_id: str
+    complaint_id: Optional[str] = None
     payment_id: Optional[str] = None
     outcome: str  # AUTO_RESOLVED, PENDING_APPROVAL, ESCALATED, REJECTED, UNKNOWN
     final_message: str

@@ -199,7 +199,8 @@ class ResolutionAgent:
         elif action == "ESCALATE":
             tools_called.append("db.add(SupportTicket)")
             ticket_id = f"TKT_{uuid.uuid4().hex[:8].upper()}"
-            category = "FRAUD_DISPUTE" if policy_decision["risk_score"] >= 0.5 else "PAYMENT_INVESTIGATION"
+            fraud_trigger = policy_decision.get("evidence", {}).get("rules_evaluated", {}).get("fraud_trigger", False)
+            category = "FRAUD_DISPUTE" if fraud_trigger else "PAYMENT_INVESTIGATION"
             priority = "HIGH" if category == "FRAUD_DISPUTE" else "MEDIUM"
 
             ticket = SupportTicket(

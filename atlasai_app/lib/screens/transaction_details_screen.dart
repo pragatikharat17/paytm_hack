@@ -15,7 +15,8 @@ class TransactionDetailsScreen extends StatefulWidget {
   });
 
   @override
-  State<TransactionDetailsScreen> createState() => _TransactionDetailsScreenState();
+  State<TransactionDetailsScreen> createState() =>
+      _TransactionDetailsScreenState();
 }
 
 class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
@@ -59,28 +60,37 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
       appBar: AppBar(
         title: Text('Payment ${widget.paymentId}'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadPayment,
-          ),
+          IconButton(icon: const Icon(Icons.refresh), onPressed: _loadPayment),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.tealPrimary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.tealPrimary),
+            )
           : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.error_outline, color: AppTheme.roseDanger, size: 48),
-                      const SizedBox(height: 12),
-                      Text('Error: $_error', style: const TextStyle(color: AppTheme.textMuted)),
-                      const SizedBox(height: 16),
-                      ElevatedButton(onPressed: _loadPayment, child: const Text('Retry')),
-                    ],
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: AppTheme.roseDanger,
+                    size: 48,
                   ),
-                )
-              : _buildContent(),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Error: $_error',
+                    style: const TextStyle(color: AppTheme.textMuted),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadPayment,
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            )
+          : _buildContent(),
     );
   }
 
@@ -101,16 +111,18 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: isFailed
-                    ? [AppTheme.navyElevated, const Color(0xFF2C1E2B)]
+                    ? [AppTheme.surfaceTint, const Color(0xFFFFE9ED)]
                     : isSuccess
-                        ? [AppTheme.navyElevated, const Color(0xFF132E27)]
-                        : [AppTheme.navyElevated, AppTheme.navyCard],
+                    ? [AppTheme.surfaceTint, const Color(0xFFE3F6ED)]
+                    : [AppTheme.surfaceTint, AppTheme.surface],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: isFailed ? AppTheme.roseDanger.withValues(alpha: 0.4) : AppTheme.borderSubtle,
+                color: isFailed
+                    ? AppTheme.roseDanger.withValues(alpha: 0.4)
+                    : AppTheme.borderSubtle,
               ),
             ),
             child: Column(
@@ -128,13 +140,16 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: isFailed
                             ? AppTheme.roseDanger.withValues(alpha: 0.2)
                             : isSuccess
-                                ? AppTheme.emeraldSuccess.withValues(alpha: 0.2)
-                                : AppTheme.amberWarning.withValues(alpha: 0.2),
+                            ? AppTheme.emeraldSuccess.withValues(alpha: 0.2)
+                            : AppTheme.amberWarning.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -143,8 +158,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                           color: isFailed
                               ? AppTheme.roseDanger
                               : isSuccess
-                                  ? AppTheme.emeraldSuccess
-                                  : AppTheme.amberWarning,
+                              ? AppTheme.emeraldSuccess
+                              : AppTheme.amberWarning,
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -165,7 +180,10 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Method: ${p.method} • Order: ${p.orderId}',
-                  style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+                  style: const TextStyle(
+                    color: AppTheme.textMuted,
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
@@ -175,13 +193,17 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           // Diagnostic Switch & Bank Status
           const Text(
             'Payment Gateway Diagnostics',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textPrimary,
+            ),
           ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppTheme.navyCard,
+              color: AppTheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppTheme.borderSubtle),
             ),
@@ -191,14 +213,18 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   'Gateway Switch Status',
                   p.gatewayStatus,
                   icon: Icons.alt_route,
-                  color: p.gatewayStatus == 'SUCCESS' ? AppTheme.emeraldSuccess : AppTheme.roseDanger,
+                  color: p.gatewayStatus == 'SUCCESS'
+                      ? AppTheme.emeraldSuccess
+                      : AppTheme.roseDanger,
                 ),
                 const Divider(color: AppTheme.borderSubtle, height: 24),
                 _buildDiagnosticRow(
                   'Bank Account Debit',
                   p.bankStatus,
                   icon: Icons.account_balance,
-                  color: p.bankStatus == 'DEBITED' ? AppTheme.amberWarning : AppTheme.emeraldSuccess,
+                  color: p.bankStatus == 'DEBITED'
+                      ? AppTheme.amberWarning
+                      : AppTheme.emeraldSuccess,
                 ),
                 if (p.bankRef != null) ...[
                   const Divider(color: AppTheme.borderSubtle, height: 24),
@@ -233,7 +259,8 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) => AIAssistantScreen(
-                      initialPrompt: 'My payment ${p.paymentId} for ₹${p.amount.toInt()} failed. Please investigate and refund.',
+                      initialPrompt:
+                          'My payment ${p.paymentId} for ₹${p.amount.toInt()} failed. Please investigate and refund.',
                       paymentIdHint: p.paymentId,
                     ),
                   ),
@@ -242,9 +269,14 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               icon: const Icon(Icons.support_agent, color: Colors.black),
               label: const Text(
                 'Resolve with AtlasAI Teammate',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.tealPrimary),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.tealPrimary,
+              ),
             ),
           ),
         ],
@@ -252,7 +284,12 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
     );
   }
 
-  Widget _buildDiagnosticRow(String label, String value, {required IconData icon, required Color color}) {
+  Widget _buildDiagnosticRow(
+    String label,
+    String value, {
+    required IconData icon,
+    required Color color,
+  }) {
     return Row(
       children: [
         Icon(icon, color: color, size: 20),
@@ -261,9 +298,19 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(fontSize: 12, color: AppTheme.textMuted)),
+              Text(
+                label,
+                style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+              ),
               const SizedBox(height: 2),
-              Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: color)),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
             ],
           ),
         ),
