@@ -34,14 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final payments = await ApiService().fetchPayments();
       final complaints = await ApiService().fetchComplaints();
+      if (!mounted) return;
       setState(() {
         _payments = payments;
         _complaints = complaints;
         _isLoading = false;
       });
     } catch (e) {
+      debugPrint('Home data load failed: $e');
+      if (!mounted) return;
       setState(() {
-        _errorMessage = e.toString();
+        _errorMessage =
+            'Unable to connect. Check your connection and tap refresh to retry.';
         _isLoading = false;
       });
     }
@@ -63,9 +67,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.bolt, size: 18, color: Colors.black87),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'AtlasAI Paytm',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+            const Expanded(
+              child: Text(
+                'AtlasAI Paytm',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+              ),
             ),
           ],
         ),
@@ -78,13 +84,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.tealPrimary))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.tealPrimary),
+            )
           : RefreshIndicator(
               onRefresh: _loadData,
               color: AppTheme.tealPrimary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  16,
+                  20,
+                  100 + MediaQuery.paddingOf(context).bottom,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -95,16 +108,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: BoxDecoration(
                           color: AppTheme.roseDanger.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppTheme.roseDanger.withValues(alpha: 0.4)),
+                          border: Border.all(
+                            color: AppTheme.roseDanger.withValues(alpha: 0.4),
+                          ),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info_outline, color: AppTheme.roseDanger, size: 20),
+                            const Icon(
+                              Icons.info_outline,
+                              color: AppTheme.roseDanger,
+                              size: 20,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'Backend connection warning: $_errorMessage. Running in offline/demo mode.',
-                                style: const TextStyle(fontSize: 12, color: AppTheme.roseDanger),
+                                _errorMessage!,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.roseDanger,
+                                ),
                               ),
                             ),
                           ],
@@ -123,16 +145,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 28),
 
                     // Recent Payments
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
+                      alignment: WrapAlignment.spaceBetween,
+                      spacing: 12,
+                      runSpacing: 4,
                       children: [
                         const Text(
                           'Recent Payments',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.textPrimary,
+                          ),
                         ),
                         Text(
                           '${_payments.length} Records',
-                          style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.textMuted,
+                          ),
                         ),
                       ],
                     ),
@@ -151,11 +182,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Text(
                             'Active Cases & Disputes',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppTheme.textPrimary),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textPrimary,
+                            ),
                           ),
                           Text(
                             '${_complaints.length} Cases',
-                            style: const TextStyle(fontSize: 12, color: AppTheme.textMuted),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppTheme.textMuted,
+                            ),
                           ),
                         ],
                       ),
@@ -177,7 +215,10 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppTheme.tealPrimary,
         foregroundColor: Colors.black,
         icon: const Icon(Icons.auto_awesome),
-        label: const Text('AI Resolution Teammate', style: TextStyle(fontWeight: FontWeight.w700)),
+        label: const Text(
+          'AI Resolution Teammate',
+          style: TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
     );
   }
@@ -207,18 +248,32 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Text(
-                  'Autonomous Agent Ready',
-                  style: TextStyle(color: AppTheme.cyanAccent, fontSize: 11, fontWeight: FontWeight.w700),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Autonomous Agent Ready',
+                    style: TextStyle(
+                      color: AppTheme.cyanAccent,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
-              const Icon(Icons.shield_outlined, color: Colors.white70, size: 20),
+              const SizedBox(width: 8),
+              const Icon(
+                Icons.shield_outlined,
+                color: Colors.white70,
+                size: 20,
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -247,7 +302,11 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         const Text(
           'Hackathon Demo Scenarios',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.cyanAccent),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.cyanAccent,
+          ),
         ),
         const SizedBox(height: 10),
         SingleChildScrollView(
@@ -256,28 +315,32 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               _buildScenarioChip(
                 label: 'Scenario A: ₹499 Auto-Refund',
-                scenarioPrompt: '₹499 was deducted, but my payment failed. Please refund my money. (PAY1001)',
+                scenarioPrompt:
+                    '₹499 was deducted, but my payment failed. Please refund my money. (PAY1001)',
                 paymentId: 'PAY1001',
                 color: AppTheme.emeraldSuccess,
               ),
               const SizedBox(width: 10),
               _buildScenarioChip(
                 label: 'Scenario B: ₹1,299 Admin Approval',
-                scenarioPrompt: "My ₹1,299 payment failed. I haven't received my refund. (PAY1002)",
+                scenarioPrompt:
+                    "My ₹1,299 payment failed. I haven't received my refund. (PAY1002)",
                 paymentId: 'PAY1002',
                 color: AppTheme.amberWarning,
               ),
               const SizedBox(width: 10),
               _buildScenarioChip(
                 label: 'Scenario C: ₹899 Fraud Dispute',
-                scenarioPrompt: "I don't recognize this ₹899 transaction. This might be unauthorized fraud! (PAY1003)",
+                scenarioPrompt:
+                    "I don't recognize this ₹899 transaction. This might be unauthorized fraud! (PAY1003)",
                 paymentId: 'PAY1003',
                 color: AppTheme.roseDanger,
               ),
               const SizedBox(width: 10),
               _buildScenarioChip(
                 label: 'Scenario D: Marathi / Hindi Voice',
-                scenarioPrompt: 'माझे ₹499 खात्यातून कट झाले पण पेमेंट अयशस्वी झाले. कृपया रिफंड करा. (PAY1001)',
+                scenarioPrompt:
+                    'माझे ₹499 खात्यातून कट झाले पण पेमेंट अयशस्वी झाले. कृपया रिफंड करा. (PAY1001)',
                 paymentId: 'PAY1001',
                 color: AppTheme.cyanAccent,
               ),
@@ -317,9 +380,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
+            Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+            ),
             const SizedBox(width: 8),
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textPrimary)),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textPrimary,
+              ),
+            ),
           ],
         ),
       ),
@@ -327,41 +401,52 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildQuickActions() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildActionCard(
-            title: 'File Dispute',
-            subtitle: 'AI Agent Help',
-            icon: Icons.chat_bubble_outline,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AIAssistantScreen()),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildActionCard(
-            title: 'Voice Assistant',
-            subtitle: 'Hindi / Marathi',
-            icon: Icons.mic_none,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AIAssistantScreen(
-                    initialPrompt: '₹499 कट गए लेकिन पेमेंट फेल हो गया, मेरा रिफंड कब आएगा? PAY1001',
-                    paymentIdHint: 'PAY1001',
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+    final actions = <Widget>[
+      _buildActionCard(
+        title: 'File Dispute',
+        subtitle: 'AI Agent Help',
+        icon: Icons.chat_bubble_outline,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AIAssistantScreen()),
+          );
+        },
+      ),
+      _buildActionCard(
+        title: 'Voice Assistant',
+        subtitle: 'Hindi / Marathi',
+        icon: Icons.mic_none,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AIAssistantScreen(
+                initialPrompt:
+                    '₹499 कट गए लेकिन पेमेंट फेल हो गया, मेरा रिफंड कब आएगा? PAY1001',
+                paymentIdHint: 'PAY1001',
+              ),
+            ),
+          );
+        },
+      ),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth <
+            480 * MediaQuery.textScalerOf(context).scale(1)) {
+          return Column(
+            children: [actions[0], const SizedBox(height: 12), actions[1]],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: actions[0]),
+            const SizedBox(width: 12),
+            Expanded(child: actions[1]),
+          ],
+        );
+      },
     );
   }
 
@@ -392,13 +477,28 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Icon(icon, color: AppTheme.tealPrimary, size: 22),
             ),
             const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textPrimary)),
-                const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(fontSize: 11, color: AppTheme.textMuted)),
-              ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -437,21 +537,21 @@ class _HomeScreenState extends State<HomeScreen> {
             color: isFailed
                 ? AppTheme.roseDanger.withValues(alpha: 0.15)
                 : isSuccess
-                    ? AppTheme.emeraldSuccess.withValues(alpha: 0.15)
-                    : AppTheme.amberWarning.withValues(alpha: 0.15),
+                ? AppTheme.emeraldSuccess.withValues(alpha: 0.15)
+                : AppTheme.amberWarning.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
             isFailed
                 ? Icons.error_outline
                 : isSuccess
-                    ? Icons.check_circle_outline
-                    : Icons.hourglass_top,
+                ? Icons.check_circle_outline
+                : Icons.hourglass_top,
             color: isFailed
                 ? AppTheme.roseDanger
                 : isSuccess
-                    ? AppTheme.emeraldSuccess
-                    : AppTheme.amberWarning,
+                ? AppTheme.emeraldSuccess
+                : AppTheme.amberWarning,
             size: 22,
           ),
         ),
@@ -460,11 +560,19 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(
               p.paymentId,
-              style: const TextStyle(fontWeight: FontWeight.w700, color: AppTheme.textPrimary, fontSize: 15),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+                fontSize: 15,
+              ),
             ),
             Text(
               '₹${p.amount.toStringAsFixed(2)}',
-              style: const TextStyle(fontWeight: FontWeight.w800, color: AppTheme.textPrimary, fontSize: 16),
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                color: AppTheme.textPrimary,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -483,8 +591,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Row(
                 children: [
-                  Text('Details', style: TextStyle(fontSize: 11, color: AppTheme.cyanAccent)),
-                  Icon(Icons.chevron_right, size: 14, color: AppTheme.cyanAccent),
+                  Text(
+                    'Details',
+                    style: TextStyle(fontSize: 11, color: AppTheme.cyanAccent),
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 14,
+                    color: AppTheme.cyanAccent,
+                  ),
                 ],
               ),
             ],
@@ -515,10 +630,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        leading: const Icon(Icons.assignment_outlined, color: AppTheme.cyanAccent),
+        leading: const Icon(
+          Icons.assignment_outlined,
+          color: AppTheme.cyanAccent,
+        ),
         title: Text(
           c.complaintId,
-          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: AppTheme.textPrimary),
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+            color: AppTheme.textPrimary,
+          ),
         ),
         subtitle: Text(
           c.rawText,
@@ -534,7 +656,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Text(
             c.status,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppTheme.tealPrimary),
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.tealPrimary,
+            ),
           ),
         ),
       ),
@@ -545,7 +671,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       alignment: Alignment.center,
-      child: Text(text, style: const TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+      child: Text(
+        text,
+        style: const TextStyle(color: AppTheme.textMuted, fontSize: 13),
+      ),
     );
   }
 }

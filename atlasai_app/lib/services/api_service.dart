@@ -10,11 +10,15 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
-  // Smart base URL: defaults to 10.0.2.2 for Android emulator, localhost for Web/Desktop
+  // Override for another device/network with --dart-define=API_BASE_URL=...
   String get baseUrl {
+    const configuredUrl = String.fromEnvironment('API_BASE_URL');
+    if (configuredUrl.isNotEmpty) {
+      return configuredUrl.replaceFirst(RegExp(r'/+$'), '');
+    }
     if (kIsWeb) return 'http://localhost:8000';
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:8000';
+      return 'http://10.2.30.85:8000';
     }
     return 'http://localhost:8000';
   }
@@ -42,7 +46,9 @@ class ApiService {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       return AgentResolution.fromJson(data);
     } else {
-      throw Exception('Failed to resolve complaint: ${response.statusCode} - ${response.body}');
+      throw Exception(
+        'Failed to resolve complaint: ${response.statusCode} - ${response.body}',
+      );
     }
   }
 
@@ -62,7 +68,9 @@ class ApiService {
 
   /// Fetches a single payment record by payment_id
   Future<PaymentItem> fetchPayment(String paymentId) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/payments/$paymentId'));
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/payments/$paymentId'),
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       return PaymentItem.fromJson(data);
@@ -84,7 +92,9 @@ class ApiService {
 
   /// Fetches a specific complaint by ID
   Future<ComplaintItem> fetchComplaint(String complaintId) async {
-    final response = await http.get(Uri.parse('$baseUrl/api/complaints/$complaintId'));
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/complaints/$complaintId'),
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       return ComplaintItem.fromJson(data);
@@ -103,7 +113,9 @@ class ApiService {
     final request = http.MultipartRequest('POST', uri);
 
     if (audioBytes != null && audioBytes.isNotEmpty) {
-      request.files.add(http.MultipartFile.fromBytes('file', audioBytes, filename: 'audio.wav'));
+      request.files.add(
+        http.MultipartFile.fromBytes('file', audioBytes, filename: 'audio.wav'),
+      );
     } else if (audioBase64 != null) {
       request.fields['audio_base64'] = audioBase64;
     }
@@ -127,10 +139,7 @@ class ApiService {
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'text': text,
-        'language_code': languageCode,
-      }),
+      body: jsonEncode({'text': text, 'language_code': languageCode}),
     );
 
     if (response.statusCode == 200) {
