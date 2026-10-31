@@ -3,6 +3,7 @@ import '../models/payment_model.dart';
 import '../models/complaint_model.dart';
 import '../theme/app_theme.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'ai_assistant_screen.dart';
 import 'transaction_details_screen.dart';
 import 'complaint_tracking_screen.dart';
@@ -111,6 +112,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            tooltip: 'Sign out',
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              try {
+                await AuthScope.of(context).signOut();
+              } catch (error) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(AuthService.errorMessage(error))),
+                  );
+                }
+              }
+            },
+          ),
           IconButton(
             onPressed: _isLoading ? null : _loadData,
             icon: const Icon(Icons.refresh_rounded),

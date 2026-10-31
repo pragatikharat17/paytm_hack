@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1006526658193",
+    "project_id": "atlasai-paytm",
+    "storage_bucket": "atlasai-paytm.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006526658193:android:2138f49d21c04a5d04f130",
+        "android_client_info": {
+          "package_name": "com.example.atlasai_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXr9ORaRyZEyq4vJzkDA3efkP_fQqMeMQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

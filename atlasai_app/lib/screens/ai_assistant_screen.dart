@@ -160,11 +160,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final message = e is ApiException
+            ? e.message
+            : 'We could not contact the resolution teammate. Check your connection and try again.';
         setState(() {
           _messages.add(
             ChatMessage(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
-              text: 'Unable to connect to resolution teammate: $e',
+              text: message,
               isUser: false,
               timestamp: DateTime.now(),
             ),
