@@ -1,175 +1,203 @@
-# AtlasAI
+# AtlasAI — Autonomous AI Customer Resolution Teammate
 
-**ET AI Hackathon 2026 · Problem Statement 8 — Industrial Knowledge Intelligence**
+**Paytm Build for India AI Hackathon 2026 · Track 3: Autonomous AI Teammates**
 
-### The Unified Asset & Operations Brain for Industrial Teams
+> **"Never make customers wait for refunds. Never let AI act without deterministic policy guardrails."**
 
-> "Stop searching through hundreds of manuals. Start asking AtlasAI."
-
-AtlasAI is an AI-powered industrial maintenance assistant that helps engineers, technicians, plant managers, and auditors retrieve equipment knowledge, diagnose issues, and generate maintenance documents. It's built on Retrieval-Augmented Generation (RAG), a knowledge graph, and a large language model, so answers are grounded in your team's actual documentation instead of guesswork.
-
-Instead of digging through SOPs, maintenance logs, and equipment manuals by hand, you can just ask AtlasAI a question in plain language and get a sourced answer back in seconds.
+AtlasAI is a production-inspired, autonomous customer resolution teammate designed for digital payment ecosystems. It investigates failed payments, missing refunds, and transaction disputes across **English, Hindi, and Marathi**, combines multi-agent reasoning with deterministic policy rules, executes and verifies simulated payment settlements, and escalates sensitive edge cases to human supervisors with a complete audit trail.
 
 ---
 
-## Try It
+## 🌟 Executive Summary
 
-**App:** [Download / open the AtlasAI app](https://drive.google.com/file/d/1ZdDgrQgCD-Nn1dSDNyetgU0NA_dh2eAS/view?usp=sharing)
+In digital payments, automated chatbots frequently give canned, non-committal answers ("Please wait 3-5 business days") while customers remain anxious about debited funds.
 
-**Backend API:** [https://ethack-genai.onrender.com/](https://ethack-genai.onrender.com/)
-
-The backend is hosted on Render's free tier, so the first request after a period of inactivity can take 30-60 seconds to wake the service up. Requests after that are fast. If you're demoing this live, hit `GET /ping` a minute beforehand to warm it up.
-
----
-
-## Why We Built This
-
-Industrial maintenance teams deal with thousands of pages of documentation — manuals, SOPs, inspection logs, incident reports. Finding the right piece of information during an actual equipment failure is usually slow, manual, and easy to get wrong.
-
-AtlasAI uses semantic search and retrieval-augmented generation to read through that documentation the way an experienced engineer would, and gives equipment-specific answers grounded in what's actually been written down, not a generic guess.
+AtlasAI changes this by functioning as an **Autonomous AI Teammate**, capable of:
+1. Ingesting spoken or typed complaints in **Hindi, Marathi, and English** via **Sarvam AI**.
+2. Querying core switch records and simulated payment gateway APIs.
+3. Evaluating deterministic refund policies (e.g. ₹1,000 autonomous refund limit, duplicate detection, fraud risk).
+4. Executing simulated payment reversals and **verifying settlement confirmation** before claiming success.
+5. Pausing high-value transactions for **one-click supervisor sign-off** in a React Admin Operations Portal.
+6. Maintaining an immutable cryptographic audit trail of every agent action and tool call.
 
 ---
 
-## What It Does
+## 🏗️ Multi-Agent Architecture
 
-**Knowledge Assistant**
-Ask questions in plain language and get answers grounded in your uploaded maintenance documents, with equipment-aware search and source citations for every response.
-
-**Retrieval-Augmented Generation**
-Answers are built only from what's actually in your documents. If the answer isn't in there, AtlasAI says so instead of making something up.
-
-**AI Action Engine**
-Generates maintenance documents on demand:
-- Root Cause Analysis reports
-- Maintenance checklists
-- Inspection reports
-- Preventive maintenance plans
-- Corrective action reports
-- Audit reports
-
-**Role-Based Responses**
-The same question gets answered differently depending on who's asking:
-
-- *Engineer* — technical troubleshooting, repair recommendations, inspection guidance
-- *Plant Manager* — maintenance planning, compliance monitoring, resource allocation
-- *Technician* — step-by-step repair instructions, equipment-specific procedures
-- *Auditor* — compliance verification, documentation review, audit summaries
-
----
-
-## How It Works
-
-```text
-             Maintenance Documents
-                      |
-                      v
-          Document Processing & Embeddings
-                      |
-                      v
-              Chroma Vector Database
-                      |
-                      v
-         Semantic Search + Knowledge Graph
-                      |
-                      v
-              Groq — Llama 3.3 70B
-                      |
-                      v
-         Explainable AI Recommendations
-                      |
-                      v
-       Action Engine + Knowledge Assistant
-                      |
-                      v
-              Role-Based Response
+```
+                       CUSTOMER INTERFACE (Flutter / Web / Android)
+                     [Voice / Text in English, Hindi, or Marathi]
+                                         │
+                                         ▼
+                     SARVAM AI ENGINE (STT / Translation / TTS)
+                                         │
+                                         ▼
+                   ┌───────────────────────────────────────────┐
+                   │        AGENT 1: ORCHESTRATOR AGENT        │
+                   │  - Intent & Language Classification       │
+                   │  - Entity & Payment ID Extraction         │
+                   │  - Multi-Agent Workflow State Machine     │
+                   └─────────────────────┬─────────────────────┘
+                                         │
+         ┌───────────────────────────────┼───────────────────────────────┐
+         ▼                               ▼                               ▼
+┌──────────────────┐           ┌──────────────────┐            ┌──────────────────┐
+│     AGENT 2:     │           │     AGENT 3:     │            │     AGENT 5:     │
+│TRANSACTION AGENT │           │POLICY & RISK AGENT│           │CASE MEMORY AGENT │
+│- Bank Debit Check│           │- ₹1,000 Limit    │            │- Duplicate Guard │
+│- Gateway Switch  │           │- Fraud Indicators│            │- Case History    │
+│- Core Ledger     │           │- Admin Escalation│            │- Playbook Memory │
+└────────┬─────────┘           └─────────┬────────┘            └────────┬─────────┘
+         │                               │                              │
+         └───────────────────────────────┼──────────────────────────────┘
+                                         ▼
+                   ┌───────────────────────────────────────────┐
+                   │        AGENT 4: RESOLUTION AGENT          │
+                   │  - Executes Permitted Simulated Refunds   │
+                   │  - Verifies Settlement Switch UTR         │
+                   │  - Creates Tier-2 Fraud Dispute Tickets   │
+                   │  - Generates Multilingual Audio Synthesis │
+                   └─────────────────────┬─────────────────────┘
+                                         │
+                  ┌──────────────────────┴──────────────────────┐
+                  ▼                                             ▼
+       [Outcomes: AUTO_RESOLVED]                    [SUPERVISOR PORTAL]
+     Instant Settlement Confirmed                High-Value Approval Queue
 ```
 
-### Architecture
+### Specialized Agents
 
-![AtlasAI Architecture](docs/architecture-diagram.jpg)
+| Agent | Core Responsibility | Deterministic Tooling |
+|---|---|---|
+| **Agent 1: Orchestrator** | Accepts complaints, identifies language & intent, coordinates pipeline. | Sarvam NLU, regex parser, state machine. |
+| **Agent 2: Transaction** | Retrieves payment & order records; checks if bank debited & switch dropped. | `SimulatedPaymentGateway.get_payment()` |
+| **Agent 3: Policy & Risk** | Evaluates business rules, limits (₹1,000 threshold), and fraud indicators. | `PolicyEngine.evaluate()` |
+| **Agent 4: Resolution** | Initiates refunds, verifies settlement confirmation, or files tickets. | `SimulatedPaymentGateway.initiate_refund()` |
+| **Agent 5: Case Memory** | Prevents duplicate refund claims, retrieves history and precedents. | SQLite query cache & playbook hashing |
+| **Learning Agent** | Captures successful human-approved supervisor resolutions into reusable playbooks. | `ResolutionPlaybook` store |
 
-The system has three main pieces: a Flutter client, a FastAPI backend running five core services (Auth, Document, Knowledge Agent, Action Engine, Graph), and an AI/ML pipeline that handles ingestion, chunking, embedding, vector storage, retrieval, and generation. External services are Groq (for the LLM) and a sentence-transformers embedding model.
-
----
-
-## 🛠️ Tech Stack
-
-### 🎨 Frontend
-
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg" width="22"/> Flutter &nbsp;
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg" width="22"/> Dart &nbsp;
-<img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="22"/> Firebase Authentication &nbsp;
-<img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="22"/> Cloud Firestore &nbsp;
-<img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="22"/> Firebase Storage
-
-### ⚙️ Backend
-
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="22"/> FastAPI &nbsp;
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="22"/> Python
-
-### 🤖 AI / ML
-
-🦙 Groq (Llama 3.3 70B) &nbsp;
-🔍 Retrieval-Augmented Generation (RAG) &nbsp;
-💾 ChromaDB &nbsp;
-🤗 Sentence Transformers &nbsp;
-🧠 Knowledge Graph
-
-### 🗄️ Database
-
-<img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" width="22"/> Firestore &nbsp;
-💾 Chroma Vector Database
+> [!IMPORTANT]
+> **Critical Architecture Rule:** LLMs interpret, classify, summarize, and translate. **Refund authorizations, limit checks, and state changes are strictly enforced by deterministic Python backend rules.**
 
 ---
 
-## Getting Started
+## 🎯 The 4 Tested Demo Scenarios
 
-### Backend
+| Scenario | Customer Complaint | Payment ID & Amount | Autonomous Action & Outcome |
+|---|---|---|---|
+| **A: Auto-Refund** | *"₹499 was deducted, but my payment failed."* | `PAY1001` (₹499.00) | **AUTO_RESOLVED**: Bank debit verified, amount < ₹1,000 limit, instant simulated reversal executed with bank UTR. |
+| **B: Human Approval** | *"My ₹1,299 payment failed. I haven't received my refund."* | `PAY1002` (₹1,299.00) | **PENDING_APPROVAL**: Amount exceeds ₹1,000 autonomous threshold. Pauses in Supervisor Approval Queue for 1-click admin sign-off. |
+| **C: Fraud Dispute** | *"I don't recognize this ₹899 transaction. This might be fraud!"* | `PAY1003` (₹899.00) | **ESCALATED**: Risk score exceeds automated limit. Autonomous refund blocked; priority Tier-2 ticket `TKT_xxx` created. |
+| **D: Multilingual Voice** | Marathi / Hindi speech: *"माझे ₹499 कट झाले पण पेमेंट अयशस्वी झाले."* | `PAY1001` (₹499.00) | **MULTILINGUAL RESOLUTION**: Sarvam STT transcribes speech, normalizes to English for agents, translates to Marathi, and synthesizes audio via Sarvam Bulbul TTS. |
 
+---
+
+## 💻 Tech Stack
+
+- **Backend**: Python 3.11+, FastAPI, SQLAlchemy ORM, SQLite, Pydantic v2, HTTPX.
+- **AI & Voice**: Sarvam AI (`saarika:v2` STT, `bulbul:v1` TTS, Hindi/Marathi/English translation, conversational reasoning).
+- **Customer Application**: Flutter 3.44+ (Dart 3.12+), Material 3, Dark Navy & Electric Teal fintech design, Audio playback via `audioplayers`.
+- **Admin Operations Dashboard**: React 18, Vite, Tailwind CSS, Lucide icons, responsive desktop-first layout.
+
+---
+
+## 🚀 Quickstart Guide
+
+### 1. Prerequisites
+- Python 3.10+
+- Node.js 18+ & npm
+- Flutter 3.20+ (for mobile/web customer app)
+
+---
+
+### 2. Backend Setup & Test Suite
 ```bash
 cd atlasai_backend
-cp .env.example .env   # fill in GROQ_API_KEY, HF_API_TOKEN, etc.
-docker compose up --build
+
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Run automated test suite (Tests Scenarios A, B, C, D & Policy Guardrails)
+python3 test_atlasai_pipeline.py
+
+# 3. Start FastAPI server
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+- Backend API Docs (Swagger): `http://localhost:8000/docs`
+- Health check: `http://localhost:8000/health`
 
-Check it's running:
+---
 
+### 3. React Admin Operations Dashboard
 ```bash
-curl http://localhost:8000/ping
+cd atlasai_admin
+
+# 1. Install packages
+npm install
+
+# 2. Start Vite dev server
+npm run dev
 ```
+Open `http://localhost:5173` to access:
+- **Operations Overview**: Real-time KPI cards & multi-agent mesh.
+- **Supervisor Approvals**: Review high-value cases (e.g. `PAY1002` ₹1,299) and Approve/Reject with 1 click.
+- **Case Evidence Drawer**: Inspect payment switch logs, multi-agent reasoning, and audit logs.
+- **Demo Scenario Runner**: 1-click execution of Scenarios A, B, C, D directly from the admin panel.
 
-### Frontend
+---
 
+### 4. Customer Flutter Application
 ```bash
 cd atlasai_app
-flutter pub get
-flutter run
+
+# 1. Verify dependencies & analyze code
+flutter analyze
+
+# 2. Run Flutter app on Web, Android, or Linux
+flutter run -d chrome
+# or on Android device/emulator:
+# flutter run -d android
 ```
 
 ---
 
-## Where We'd Take This Next
+## 📊 Database Schema & Demo Records
 
-- IoT sensor integration for real-time equipment data
-- Predictive maintenance based on historical patterns
-- Voice commands for hands-free field use
-- ERP/SAP integration
-- Smart notifications for anomalies and overdue maintenance
-- Multi-language support for regional teams
-- A more mobile-first field experience
+The SQLite database seeds automatically on startup with fictional demo payments:
 
----
-
-## Team
-
-**Team GenAI**
-
-| Role | Name | GitHub |
-|------|------|--------|
-| Team Lead | Sanika Deshmukh | [@sanikad20](https://github.com/sanikad20) |
-| Team Member | Pragati Kharat | [@pragatikharat17](https://github.com/pragatikharat17) |
-| Team Member | Divya Addagatla | [@adivya15](https://github.com/adivya15) |
+| Payment ID | Order ID | Amount | Switch Status | Bank Status | Scenario Covered |
+|---|---|---|---|---|---|
+| `PAY1001` | `ORD2001` | ₹499.00 | `FAILED` | `DEBITED` | Eligible for autonomous refund |
+| `PAY1002` | `ORD2002` | ₹1,299.00 | `FAILED` | `DEBITED` | Requires supervisor approval (> ₹1,000) |
+| `PAY1003` | `ORD2003` | ₹899.00 | `SUCCESS` | `DEBITED` | Unrecognized charge / Fraud escalation |
+| `PAY1004` | `ORD2004` | ₹799.00 | `PENDING` | `DEBITED` | Pending investigation |
 
 ---
 
-If you found AtlasAI interesting, consider starring the repository.
+## 🛡️ Deterministic Refund State Machine
+
+```
+[REQUESTED]
+     │
+     ├── (Amount ≤ ₹1,000 & Safe) ──► [PROCESSING] ──► [COMPLETED] (Verified UTR)
+     │
+     ├── (Amount > ₹1,000) ──────────► [PENDING_APPROVAL]
+     │                                        │
+     │                           ┌────────────┴────────────┐
+     │                           ▼                         ▼
+     │                      [APPROVED]                [REJECTED]
+     │                           │
+     │                           ▼
+     │                     [PROCESSING] ──► [COMPLETED]
+     │
+     └── (Fraud Indicator) ──────────► [ESCALATED] (Ticket Created)
+```
+
+No refund is marked `COMPLETED` without simulated payment switch verification.
+
+---
+
+## 👥 Hackathon Team & Acknowledgments
+Built for **Paytm Build for India AI Hackathon 2026**
+- Track 3: Autonomous AI Teammates
+- Powered by **Sarvam AI** for Indian-language speech and translation.

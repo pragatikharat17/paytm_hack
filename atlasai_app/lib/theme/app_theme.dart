@@ -1,80 +1,86 @@
 import 'package:flutter/material.dart';
 
-/// Shared design tokens. Extracted out of main.dart's old inline
-/// ThemeData so every screen (Day 4 auth, Day 5 chat/timeline/capture)
-/// can reference the same palette/spacing instead of hardcoding values.
-///
-/// Colors are built around the same seed main.dart used before this
-/// file existed (0xFF1F4E5F — a dark industrial teal), so switching to
-/// AppTheme.light() doesn't visually change anything already shipped.
-class AppColors {
-  AppColors._();
-
-  static const Color primary = Color(0xFF1F4E5F);
-  static const Color background = Color(0xFFF5F7F8);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceMuted = Color(0xFFEDF1F2);
-  static const Color border = Color(0xFFDCE3E5);
-
-  static const Color textPrimary = Color(0xFF1A2327);
-  static const Color textSecondary = Color(0xFF5B6B70);
-  static const Color textFaint = Color(0xFF8C9A9E);
-
-  static const Color success = Color(0xFF2E7D32);
-  static const Color successBg = Color(0xFFE6F4E8);
-
-  static const Color warning = Color(0xFFB8720A);
-  static const Color warningBg = Color(0xFFFCF0DC);
-
-  static const Color danger = Color(0xFFC62828);
-  static const Color dangerBg = Color(0xFFFBE7E7);
-}
-
-class AppSpacing {
-  AppSpacing._();
-
-  static const double xs = 4;
-  static const double sm = 8;
-  static const double md = 16;
-  static const double lg = 24;
-  static const double xl = 32;
-}
-
-class AppRadius {
-  AppRadius._();
-
-  static const double sm = 6;
-  static const double md = 10;
-  static const double lg = 16;
-  static const double pill = 999;
-}
-
 class AppTheme {
-  AppTheme._();
+  // Brand colors
+  static const Color navyBackground = Color(0xFF0A192F);
+  static const Color navyCard = Color(0xFF112240);
+  static const Color navyElevated = Color(0xFF1B2A4A);
+  static const Color tealPrimary = Color(0xFF00B4D8);
+  static const Color cyanAccent = Color(0xFF00E5FF);
+  static const Color amberWarning = Color(0xFFF59E0B);
+  static const Color emeraldSuccess = Color(0xFF10B981);
+  static const Color roseDanger = Color(0xFFEF4444);
 
-  static ThemeData light() {
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textMuted = Color(0xFF94A3B8);
+  static const Color borderSubtle = Color(0xFF233554);
+
+  static ThemeData dark() {
     return ThemeData(
       useMaterial3: true,
-      colorSchemeSeed: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.background,
-      appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.textPrimary,
-        elevation: 0,
-        surfaceTintColor: Colors.transparent,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: navyBackground,
+      colorScheme: const ColorScheme.dark(
+        primary: tealPrimary,
+        secondary: cyanAccent,
+        surface: navyCard,
+        error: roseDanger,
+        onPrimary: Colors.black,
+        onSecondary: Colors.black,
+        onSurface: textPrimary,
       ),
-      cardTheme: CardThemeData(
-        color: AppColors.surface,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: navyBackground,
+        foregroundColor: textPrimary,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: AppColors.border),
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: textPrimary,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          letterSpacing: -0.5,
         ),
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      cardTheme: const CardThemeData(
+        color: navyCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+          side: BorderSide(color: borderSubtle, width: 1),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surfaceMuted,
-        border: OutlineInputBorder(borderSide: BorderSide.none),
+        fillColor: navyElevated,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: borderSubtle),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: borderSubtle),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: tealPrimary, width: 2),
+        ),
+        hintStyle: const TextStyle(color: textMuted, fontSize: 14),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: tealPrimary,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }
